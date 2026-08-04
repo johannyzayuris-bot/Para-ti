@@ -16,57 +16,117 @@
             height: 100vh;
             font-family: 'Arial', sans-serif;
             overflow: hidden;
+            position: relative;
+        }
+        .reproductor-container {
+            display: none; /* Se muestra al presionar */
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 40px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 12px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+        .reproductor-title {
+            font-size: 16px;
+            color: #d11a2a;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        audio {
+            outline: none;
+            height: 40px;
+        }
+        .heart-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 200px;
+            height: 200px;
         }
         .heart-btn {
-            font-size: 80px;
+            font-size: 90px;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: transform 0.2s;
             background: none;
             border: none;
             outline: none;
+            z-index: 5;
+            color: #d11a2a;
         }
-        .heart-btn:hover {
-            transform: scale(1.2);
+        .heart-btn:active {
+            transform: scale(0.9);
         }
         .heart-btn.active {
             animation: beat 0.6s infinite alternate;
         }
         @keyframes beat {
-            to { transform: scale(1.4); }
+            to { transform: scale(1.2); }
         }
-        .frase-container {
-            margin-top: 30px;
-            font-size: 24px;
+        /* EFECTO DE LAS FRASES SALIENDO DEL CORAZÓN */
+        .frase-flotante {
+            position: absolute;
+            font-size: 22px;
             color: #d11a2a;
             font-weight: bold;
             text-align: center;
-            min-height: 40px;
-            padding: 0 20px;
+            width: 280px;
+            pointer-events: none;
+            opacity: 0;
+            animation: flotarYSalir 4s forwards ease-out;
+            z-index: 2;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        @keyframes flotarYSalir {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(-40px) scale(1);
+            }
+            80% {
+                opacity: 1;
+                transform: translateY(-100px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-140px) scale(0.8);
+            }
         }
         .indicador {
-            margin-bottom: 20px;
+            position: absolute;
+            bottom: 40px;
             font-size: 16px;
             color: #555;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="indicador" id="texto-guia">Presiona el corazón ❤</div>
-    
-    <!-- Botón del Corazón -->
-    <button class="heart-btn" id="boton-corazon" onclick="iniciarPagina()">❤</button>
-    
-    <!-- Lugar donde salen las frases -->
-    <div class="frase-container" id="caja-frase"></div>
+    <!-- Reproductor que sale arriba -->
+    <div class="reproductor-container" id="contenedor-audio">
+        <div class="reproductor-title">Te dedico esta canción ❤</div>
+        <audio id="musica-fondo" controls loop>
+            <source src="musica.mp3" type="audio/mpeg">
+        </audio>
+    </div>
 
-    <!-- Reproductor de Música Oculto -->
-    <audio id="musica-fondo" loop>
-        <source src="musica.mp3" type="audio/mpeg">
-    </audio>
+    <!-- El Corazón Mágico -->
+    <div class="heart-container" id="espacio-corazon">
+        <button class="heart-btn" id="boton-corazon" onclick="alAplastarCorazon()">❤</button>
+    </div>
+
+    <div class="indicador" id="texto-guia">Press heart ❤</div>
 
     <script>
-        // ESCRIBE AQUÍ TUS FRASES (Puedes cambiar los textos entre comillas)
+        // ESCRIBE AQUÍ TUS FRASES (Puedes cambiarlas libremente)
         const frases = [
             "Eres mi lugar favorito. Gracias por llegar a mi vida. 💖",
             "Contigo todo es mejor. Siempre te elegiría a ti.",
@@ -75,35 +135,43 @@
             "Eres mi persona favorita. Gracias por hacerme sonreír. 💕",
             "Tu abrazo es mi hogar. Eres mi mejor casualidad.",
             "Eres el amor que siempre soñé. Mi corazón te pertenece.",
-            "Te amo más de lo que las palabras pueden decir. 🐻"
+            "Te amo más de lo que las palabras pueden decir. , Olafcitooo 
         ];
 
         let indice = 0;
         let musica = document.getElementById("musica-fondo");
         let boton = document.getElementById("boton-corazon");
-        let cajaFrase = document.getElementById("caja-frase");
         let textoGuia = document.getElementById("texto-guia");
+        let contenedorAudio = document.getElementById("contenedor-audio");
+        let espacioCorazon = document.getElementById("espacio-corazon");
         let iniciado = false;
 
-        function iniciarPagina() {
+        function alAplastarCorazon() {
             if (!iniciado) {
                 iniciado = true;
-                textoGuia.style.display = 'none'; // Oculta el mensaje de ayuda
-                boton.classList.add('active'); // Hace que el corazón lata
+                textoGuia.style.display = 'none';
+                boton.classList.add('active');
+                contenedorAudio.style.display = 'flex'; // Muestra el reproductor arriba
                 
-                // Intenta reproducir la música
                 musica.play().catch(error => {
-                    console.log("El navegador bloqueó el auto-play, requiere interacción.");
+                    console.log("Audio block bypass");
                 });
-
-                // Empieza a mostrar las frases una por una
-                mostrarSiguienteFrase();
-                setInterval(mostrarSiguienteFrase, 4000); // Cambia cada 4 segundos
             }
-        }
 
-        function mostrarSiguienteFrase() {
-            cajaFrase.textContent = frases[indice];
+            // Quita la frase anterior para poner la nueva
+            const fraseVieja = document.querySelector('.frase-flotante');
+            if (fraseVieja) {
+                fraseVieja.remove();
+            }
+
+            // Hace nacer la frase desde adentro del corazón
+            let nuevaFrase = document.createElement("div");
+            nuevaFrase.className = "frase-flotante";
+            nuevaFrase.textContent = frases[indice];
+            
+            espacioCorazon.appendChild(nuevaFrase);
+
+            // Cambia a la siguiente frase en la lista
             indice = (indice + 1) % frases.length;
         }
     </script>
