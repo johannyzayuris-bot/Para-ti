@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Ti ❤</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffe6e6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        .heart-btn {
+            font-size: 80px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            background: none;
+            border: none;
+            outline: none;
+        }
+        .heart-btn:hover {
+            transform: scale(1.2);
+        }
+        .heart-btn.active {
+            animation: beat 0.6s infinite alternate;
+        }
+        @keyframes beat {
+            to { transform: scale(1.4); }
+        }
+        .frase-container {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #d11a2a;
+            font-weight: bold;
+            text-align: center;
+            min-height: 40px;
+            padding: 0 20px;
+        }
+        .indicador {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="indicador" id="texto-guia">Presiona el corazón ❤</div>
+    
+    <!-- Botón del Corazón -->
+    <button class="heart-btn" id="boton-corazon" onclick="iniciarPagina()">❤</button>
+    
+    <!-- Lugar donde salen las frases -->
+    <div class="frase-container" id="caja-frase"></div>
+
+    <!-- Reproductor de Música Oculto -->
+    <audio id="musica-fondo" loop>
+        <source src="musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // ESCRIBE AQUÍ TUS FRASES (Puedes cambiar los textos entre comillas)
+        const frases = [
+            "Eres mi lugar favorito. Gracias por llegar a mi vida. 💖",
+            "Contigo todo es mejor. Siempre te elegiría a ti.",
+            "Eres mi felicidad. Mi corazón es más feliz contigo. 😊",
+            "Amo cada momento a tu lado. Eres mi paz.",
+            "Eres mi persona favorita. Gracias por hacerme sonreír. 💕",
+            "Tu abrazo es mi hogar. Eres mi mejor casualidad.",
+            "Eres el amor que siempre soñé. Mi corazón te pertenece.",
+            "Te amo más de lo que las palabras pueden decir., Olafcitooo
+      
+        ];
+
+        let indice = 0;
+        let musica = document.getElementById("musica-fondo");
+        let boton = document.getElementById("boton-corazon");
+        let cajaFrase = document.getElementById("caja-frase");
+        let textoGuia = document.getElementById("texto-guia");
+        let iniciado = false;
+
+        function iniciarPagina() {
+            if (!iniciado) {
+                iniciado = true;
+                textoGuia.style.display = 'none'; // Oculta el mensaje de ayuda
+                boton.classList.add('active'); // Hace que el corazón lata
+                
+                // Intenta reproducir la música
+                musica.play().catch(error => {
+                    console.log("El navegador bloqueó el auto-play, requiere interacción.");
+                });
+
+                // Empieza a mostrar las frases una por una
+                mostrarSiguienteFrase();
+                setInterval(mostrarSiguienteFrase, 4000); // Cambia cada 4 segundos
+            }
+        }
+
+        function mostrarSiguienteFrase() {
+            cajaFrase.textContent = frases[indice];
+            indice = (indice + 1) % frases.length;
+        }
+    </script>
+</body>
+</html>
